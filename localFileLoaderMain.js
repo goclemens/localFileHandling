@@ -4,12 +4,14 @@
 // targetObj - Reference to an js object to save the loaded data in
 // cFunc - callback function with the ascii string as argument after loading
 //#####################
-import { asciiFileLoader } from './loaders/asciiFileLoader.js';
-import { loadLocalJSON } from './loaders/loadLocalJSON.js';
+import { handlers } from './handlers/handlers.js';
 
-function localFileLoader(files,targetObj,cFunc,cArguments) {
+import { getFileExt } from './helpers/getFileExt.js';
+import { getFileName } from './helpers/getFileName.js';
 
-  // handle optional arguments
+function localFileLoader(files,targetObj,cFunc) {
+
+  // ---- handle optional arguments ----
   if ( cfunc === undefined ) {
 
     // define it as empty function so it can be called
@@ -22,63 +24,49 @@ function localFileLoader(files,targetObj,cFunc,cArguments) {
     var targetObj = {};
 
   }
+  // -----------------------------------
 
-  var extHandlers = { "txt"  : "handleTXT",
-                      "json" : "handleJSON" 
-                    };
-
+  // --- scope variables ---
   var fileLoadCount = 0;
   var fileLoadThreshold = files.length;
   console.log("fileLoader - "+files.length+" files in queue")
-
-  var handlers = {};
-
-  handlers.handleTXT = function(filePath) {
-
-    var fileName = getFileName(filePath);
-    asciiFileLoader(filePath, function(data){
-      targetObj[fileName] = data;
-    });
-    checkFinished();
-
-  }
-
-  handlers.handleJSON = function(filePath) {
-
-    var fileName = getFileName(filePath);
-    loadLocalJSON(filePath, function(jsonObject){
-      targetObj[fileName] = jsonObject;
-    });
-    checkFinished();
-
-  }
+  // -----------------------
+  
 
 
+  // --- MAIN FUNCIONALITY ---
+  // main loop  over all files
 
   for (var i = 0; i < files.lenth; i++) {
-    curFileExt = getFileExt(files[i]);
-    if (extHandlers[curFileExt] !== undefined) {      
-      handlers[extHandlers[curFileExt]](files[i]);
+
+    curFileExt = getFileExt(files[i]).toLowerCase();
+
+    if (handlers.ext[curFileExt] !== undefined) {
+
+      (function(){
+        var fileName = getFileName(files[i]);
+        handlers[handlers.ext[curFileExt]](files[i],function(dataObject){
+          targetObj[fileName] = dataObject;
+          checkFinished();          
+        });
+      })();
+
     } else {
+
       console.log("localFileLoader - '"+files[i]+"' is not supported");
+      checkFinished();
+
     }
+
   }
 
-  //------ helpers ------
-
-  function getFileName(filePath) {
-    return filePath.split('/').pop();
-  }
-
-  function getFileExt(filePath) {
-    return filePath.substr((~-fname.lastIndexOf(".") >>> 0) + 2); 
-  }
+  //------ scope helpers ------
 
   // checks if all files are loaded and calls the callback function
   function checkFinished () {
     console.log(fileLoadCount+" files loaded")
     if (fileLoadCount == fileLoadThreshold) {      
-      console.log("loadOBJMehses - callback: "+cFunc.name);
+      console.log("localFileLoader - callback: "+cFunc.name);
       cFunc(targetObj);      
     } else {
       fileLoadCount++;
@@ -88,4 +76,4 @@ function localFileLoader(files,targetObj,cFunc,cArguments) {
 
 }
 
-export default  localFileLoader ;
+export default localFileLoader ;

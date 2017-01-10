@@ -17,7 +17,7 @@ function parseEOF (fileContent) {
   cleanArray(metaLines,"");
 
   for (var i = 0; i < metaLines.length; i++) {
-    let lineSplit = metalines[i].split(/:|=/);
+    var lineSplit = metalines[i].split(/:|=/);
     fileData[metalines[i][0]] = metalines[i][1];
   }
 

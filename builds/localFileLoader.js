@@ -128,7 +128,7 @@ function parseEOF (fileContent) {
   cleanArray(metaLines,"");
 
   for (var i = 0; i < metaLines.length; i++) {
-    let lineSplit = metalines[i].split(/:|=/);
+    var lineSplit = metalines[i].split(/:|=/);
     fileData[metalines[i][0]] = metalines[i][1];
   }
 
@@ -174,7 +174,9 @@ var handlers = {};
 handlers.ext =  { "txt"  : "handleTXT",
                   "json" : "handleJSON",
                   "csv" : "handleCSV",
-                  "eof" : "handleEOF"
+                  "eof" : "handleEOF",
+                  "iof" : "handleEOF",
+                  "akf" : "handleEOF"
                 };
 
 handlers.handleTXT = handleTXT;

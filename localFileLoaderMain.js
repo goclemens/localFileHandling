@@ -42,7 +42,7 @@ function localFileLoader(files,targetObj,cFunc) {
     curFileExt = getFileExt(files[i]).toLowerCase();
 
     if (handlers.ext[curFileExt] !== undefined) {
-
+      // wrapper function to scope "fileName"
       (function(){
         var fileName = getFileName(files[i]);
         handlers[handlers.ext[curFileExt]](files[i],function(dataObject){

@@ -9,7 +9,7 @@ import { handlers } from './handlers/handlers.js';
 import { getFileExt } from './helpers/getFileExt.js';
 import { getFileName } from './helpers/getFileName.js';
 
-function localFileLoader(files,targetObj,cFunc) {
+function localFileLoader(files,cFunc,targetObj) {
 
   // ---- handle optional arguments ----
   if ( cfunc === undefined ) {

@@ -126,7 +126,7 @@ function getFileName(filePath) {
 // targetObj - Reference to an js object to save the loaded data in
 // cFunc - callback function with the ascii string as argument after loading
 //#####################
-function localFileLoader(files,targetObj,cFunc) {
+function localFileLoader(files,cFunc,targetObj) {
 
   // ---- handle optional arguments ----
   if ( cfunc === undefined ) {

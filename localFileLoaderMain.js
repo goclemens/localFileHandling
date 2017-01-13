@@ -12,7 +12,7 @@ import { getFileName } from './helpers/getFileName.js';
 function localFileLoader(files,cFunc,targetObj) {
 
   // ---- handle optional arguments ----
-  if ( cfunc === undefined ) {
+  if ( cFunc === undefined ) {
 
     // define it as empty function so it can be called
     var cFunc = function(){return;}
@@ -42,7 +42,7 @@ function localFileLoader(files,cFunc,targetObj) {
     curFileExt = getFileExt(files[i]).toLowerCase();
 
     if (handlers.ext[curFileExt] !== undefined) {
-
+      // wrapper function to scope "fileName"
       (function(){
         var fileName = getFileName(files[i]);
         handlers[handlers.ext[curFileExt]](files[i],function(dataObject){

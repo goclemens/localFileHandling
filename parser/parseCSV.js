@@ -1,4 +1,4 @@
-//// CSV extension handler
+//// CSV extension parser
 
 function parseCSV (fileContent) {
 
@@ -23,7 +23,7 @@ function parseCSV (fileContent) {
     });
 
   }
-  console.log("handleCSV return");
+  console.log("parseCSV return");
   return fileData;
 }
 

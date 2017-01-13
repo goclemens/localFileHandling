@@ -1,5 +1,5 @@
 function getFileExt(filePath) {
-  return filePath.substr((~-fname.lastIndexOf(".") >>> 0) + 2); 
+  return filePath.substr((~-filePath.lastIndexOf(".") >>> 0) + 2); 
 }
 
 export { getFileExt };

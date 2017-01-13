@@ -116,26 +116,28 @@ function cleanArray(array, deleteValue) {
 function parseEOF (fileContent) {
 
   var fileData = {};
-  var lines = fileContent.split(/\r\n|\n/);
+  fileData.data = {};
 
+  var lines = fileContent.split(/\r\n|\n/);
   var metaLines = lines.splice(0,32);
   metaLines.splice(3,1);    // remove "-- MEASURING INFOS --" at line 4
-  fileData["diagram title #1"] = metaLines.splice(4,1);
-  fileData["diagram title #2"] = metaLines.splice(5,1);
-  fileData["comment #1"] = metaLines.splice(7,1);
-  fileData["comment #2"] = metaLines.splice(8,1);
-  metaLines.splice(25,1);   // remove "-- Data --" at line 26
+  fileData["diagram title #1"] = metaLines.splice(3,1)[0];
+  fileData["diagram title #2"] = metaLines.splice(3,1)[0];
+  fileData["comment #1"] = metaLines.splice(4,1)[0];
+  fileData["comment #2"] = metaLines.splice(4,1)[0];
+  metaLines.splice(20,1);   // remove "-- Data --" at line 26
   cleanArray(metaLines,"");
 
   for (var i = 0; i < metaLines.length; i++) {
-    var lineSplit = metalines[i].split(/:|=/);
-    fileData[metalines[i][0]] = metalines[i][1];
+    var lineSplit = metaLines[i].split(/:|=/);
+    fileData[lineSplit[0]] = lineSplit[1];
   }
 
 
 
   var tableHead = lines[0].split(/\t/);
   var units = lines[1].split(/\t/);
+  
   for (var i = 0; i < tableHead.length; i++) {
 
     tableHead[i] = tableHead[i].trim()+units[i].trim();    
@@ -155,6 +157,7 @@ function parseEOF (fileContent) {
 
   }
   console.log("parseEOF return");
+  console.log(fileData);
   return fileData;
 }
 
@@ -163,7 +166,7 @@ function parseEOF (fileContent) {
 function handleEOF (filePath,cFunc) {
 
   asciiFileLoader(filePath, function(data){
-    var fileData = parseEOF (data);
+    var fileData = parseEOF(data);
     cFunc(fileData);
   });  
 
@@ -185,7 +188,7 @@ handlers.handleCSV = handleCSV;
 handlers.handleEOF = handleEOF;
 
 function getFileExt(filePath) {
-  return filePath.substr((~-fname.lastIndexOf(".") >>> 0) + 2); 
+  return filePath.substr((~-filePath.lastIndexOf(".") >>> 0) + 2); 
 }
 
 function getFileName(filePath) {
@@ -201,7 +204,7 @@ function getFileName(filePath) {
 function localFileLoader(files,cFunc,targetObj) {
 
   // ---- handle optional arguments ----
-  if ( cfunc === undefined ) {
+  if ( cFunc === undefined ) {
 
     // define it as empty function so it can be called
     var cFunc = function(){return;};
@@ -217,7 +220,7 @@ function localFileLoader(files,cFunc,targetObj) {
 
   // --- scope variables ---
   var fileLoadCount = 0;
-  var fileLoadThreshold = files.length;
+  var fileLoadThreshold = files.length-1;
   console.log("fileLoader - "+files.length+" files in queue");
   // -----------------------
   
@@ -226,9 +229,9 @@ function localFileLoader(files,cFunc,targetObj) {
   // --- MAIN FUNCIONALITY ---
   // main loop  over all files
 
-  for (var i = 0; i < files.lenth; i++) {
-
-    curFileExt = getFileExt(files[i]).toLowerCase();
+  for (var i = 0; i < files.length; i++) {
+    console.log("loading file: "+i);
+    var curFileExt = getFileExt(files[i]).toLowerCase();
 
     if (handlers.ext[curFileExt] !== undefined) {
       // wrapper function to scope "fileName"

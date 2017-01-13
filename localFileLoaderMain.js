@@ -28,7 +28,7 @@ function localFileLoader(files,cFunc,targetObj) {
 
   // --- scope variables ---
   var fileLoadCount = 0;
-  var fileLoadThreshold = files.length;
+  var fileLoadThreshold = files.length-1;
   console.log("fileLoader - "+files.length+" files in queue")
   // -----------------------
   
@@ -37,9 +37,9 @@ function localFileLoader(files,cFunc,targetObj) {
   // --- MAIN FUNCIONALITY ---
   // main loop  over all files
 
-  for (var i = 0; i < files.lenth; i++) {
-
-    curFileExt = getFileExt(files[i]).toLowerCase();
+  for (var i = 0; i < files.length; i++) {
+    console.log("loading file: "+i)
+    var curFileExt = getFileExt(files[i]).toLowerCase();
 
     if (handlers.ext[curFileExt] !== undefined) {
       // wrapper function to scope "fileName"

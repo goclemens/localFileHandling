@@ -5,26 +5,28 @@ import { cleanArray } from '../helpers/arrayHelpers.js';
 function parseEOF (fileContent) {
 
   var fileData = {};
-  var lines = fileContent.split(/\r\n|\n/);
+  fileData.data = {};
 
+  var lines = fileContent.split(/\r\n|\n/);
   var metaLines = lines.splice(0,32);
   metaLines.splice(3,1);    // remove "-- MEASURING INFOS --" at line 4
-  fileData["diagram title #1"] = metaLines.splice(4,1);
-  fileData["diagram title #2"] = metaLines.splice(5,1);
-  fileData["comment #1"] = metaLines.splice(7,1);
-  fileData["comment #2"] = metaLines.splice(8,1);
-  metaLines.splice(25,1);   // remove "-- Data --" at line 26
+  fileData["diagram title #1"] = metaLines.splice(3,1)[0];
+  fileData["diagram title #2"] = metaLines.splice(3,1)[0];
+  fileData["comment #1"] = metaLines.splice(4,1)[0];
+  fileData["comment #2"] = metaLines.splice(4,1)[0];
+  metaLines.splice(20,1);   // remove "-- Data --" at line 26
   cleanArray(metaLines,"");
 
   for (var i = 0; i < metaLines.length; i++) {
-    var lineSplit = metalines[i].split(/:|=/);
-    fileData[metalines[i][0]] = metalines[i][1];
+    var lineSplit = metaLines[i].split(/:|=/);
+    fileData[lineSplit[0]] = lineSplit[1];
   }
 
 
 
   var tableHead = lines[0].split(/\t/);
   var units = lines[1].split(/\t/);
+  
   for (var i = 0; i < tableHead.length; i++) {
 
     tableHead[i] = tableHead[i].trim()+units[i].trim();    
@@ -44,6 +46,7 @@ function parseEOF (fileContent) {
 
   }
   console.log("parseEOF return");
+  console.log(fileData);
   return fileData;
 }
 

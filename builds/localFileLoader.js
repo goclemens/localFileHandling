@@ -116,31 +116,32 @@ function cleanArray(array, deleteValue) {
 function parseEOF (fileContent) {
 
   var fileData = {};
+  fileData.metadata = {};
   fileData.data = {};
 
   var lines = fileContent.split(/\r\n|\n/);
   var metaLines = lines.splice(0,32);
   metaLines.splice(3,1);    // remove "-- MEASURING INFOS --" at line 4
-  fileData["diagram title #1"] = metaLines.splice(3,1)[0];
-  fileData["diagram title #2"] = metaLines.splice(3,1)[0];
-  fileData["comment #1"] = metaLines.splice(4,1)[0];
-  fileData["comment #2"] = metaLines.splice(4,1)[0];
+  fileData.metadata["diagram title #1"] = metaLines.splice(3,1)[0];
+  fileData.metadata["diagram title #2"] = metaLines.splice(3,1)[0];
+  fileData.metadata["comment #1"] = metaLines.splice(4,1)[0];
+  fileData.metadata["comment #2"] = metaLines.splice(4,1)[0];
   metaLines.splice(20,1);   // remove "-- Data --" at line 26
   cleanArray(metaLines,"");
 
   for (var i = 0; i < metaLines.length; i++) {
     var lineSplit = metaLines[i].split(/:|=/);
-    fileData[lineSplit[0]] = lineSplit[1];
+    fileData.metadata[lineSplit[0]] = lineSplit[1];
   }
 
 
 
   var tableHead = lines[0].split(/\t/);
   var units = lines[1].split(/\t/);
-  
+
   for (var i = 0; i < tableHead.length; i++) {
 
-    tableHead[i] = tableHead[i].trim()+units[i].trim();    
+    tableHead[i] = tableHead[i].trim()+units[i].trim();
     fileData.data[tableHead[i]] = [];             // create a new subobject for every row in the CSV file
 
   }
@@ -151,7 +152,7 @@ function parseEOF (fileContent) {
     cells.forEach( function (value, index) {      // loop through all cells in a line
 
       value = Number(value);                      // remove all whitespaces in a cell
-      fileData.data[tableHead[index]].push(value);     // add the value of the cell to the corresponding entry 
+      fileData.data[tableHead[index]].push(value);     // add the value of the cell to the corresponding entry
 
     });
 
@@ -161,14 +162,37 @@ function parseEOF (fileContent) {
   return fileData;
 }
 
+function getFileExt(filePath) {
+  return filePath.substr((~-filePath.lastIndexOf(".") >>> 0) + 2); 
+}
+
+function getFileName(filePath) {
+  return filePath.split('/').pop();
+}
+
 // handle Orthoload files
 
 function handleEOF (filePath,cFunc) {
 
   asciiFileLoader(filePath, function(data){
+
     var fileData = parseEOF(data);
+
+    var fileName = getFileName(filePath);
+    var fileExt = getFileExt(filePath);
+
+    var nameParts = fileName.split("_");
+    fileData.patient_id = nameParts[0];
+    fileData.measDate_id = nameParts[1]+"_"+nameParts[2];
+    fileData.exercise_id = nameParts[3]+"_"+nameParts[4].split(".")[0];
+    fileData.ext = fileExt;
+    fileData.fileName = fileName;
+    fileData.dataset_type = "OL";
+    fileData.data_type = "2D_list";
+
     cFunc(fileData);
-  });  
+
+  });
 
 }
 
@@ -186,14 +210,6 @@ handlers.handleTXT = handleTXT;
 handlers.handleJSON = handleJSON;
 handlers.handleCSV = handleCSV;
 handlers.handleEOF = handleEOF;
-
-function getFileExt(filePath) {
-  return filePath.substr((~-filePath.lastIndexOf(".") >>> 0) + 2); 
-}
-
-function getFileName(filePath) {
-  return filePath.split('/').pop();
-}
 
 //#####################
 // --- INPUTS ---

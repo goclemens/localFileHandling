@@ -196,6 +196,32 @@ function handleEOF (filePath,cFunc) {
 
 }
 
+// handle Orthoload files
+
+function handleAKF (filePath,cFunc) {
+
+  asciiFileLoader(filePath, function(data){
+
+    var fileData = parseEOF(data);
+
+    var fileName = getFileName(filePath);
+    var fileExt = getFileExt(filePath);
+
+    var nameParts = fileName.split("_");
+    fileData.patient_id = nameParts[0];
+    fileData.measDate_id = nameParts[1]+"_"+nameParts[2];
+    fileData.exercise_id = nameParts[3].split(".")[0];
+    fileData.ext = fileExt;
+    fileData.fileName = fileName;
+    fileData.dataset_type = "OL";
+    fileData.data_type = "2D_list";
+
+    cFunc(fileData);
+
+  });
+
+}
+
 var handlers = {};
 
 handlers.ext =  { "txt"  : "handleTXT",
@@ -203,13 +229,14 @@ handlers.ext =  { "txt"  : "handleTXT",
                   "csv" : "handleCSV",
                   "eof" : "handleEOF",
                   "iof" : "handleEOF",
-                  "akf" : "handleEOF"
+                  "akf" : "handleAKF"
                 };
 
 handlers.handleTXT = handleTXT;
 handlers.handleJSON = handleJSON;
 handlers.handleCSV = handleCSV;
 handlers.handleEOF = handleEOF;
+handlers.handleAKF = handleAKF;
 
 //#####################
 // --- INPUTS ---
